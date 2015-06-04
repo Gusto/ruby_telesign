@@ -11,6 +11,8 @@ module TeleSign
       if response.status != 200
         if response.status == 401
           raise AuthorizationError.new resp_obj, response
+        elsif response.status == 400
+          return resp_obj
         else
           raise TeleSignError.new resp_obj, response
         end

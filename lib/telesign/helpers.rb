@@ -8,11 +8,9 @@ module TeleSign
 
     def validate_response response
       resp_obj = JSON.load response.body
-      if response.status != 200
+      unless [200, 400].include?(response.status)
         if response.status == 401
           raise AuthorizationError.new resp_obj, response
-        elsif response.status == 400
-          return resp_obj
         else
           raise TeleSignError.new resp_obj, response
         end

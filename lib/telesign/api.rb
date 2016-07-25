@@ -43,6 +43,8 @@ module TeleSign
         end
         faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
       end
+      @conn.request.options.timeout = opts[:timeout].to_i unless opts[:timeout].nil?
+      @conn.request.options.open_timeout = opts[:open_timeout].to_i unless opts[:open_timeout].nil?
 
       @verify = Verify.new(conn: @conn, customer_id: opts[:customer_id], secret_key: opts[:secret_key])
       @phone_id = PhoneId.new(conn: @conn, customer_id: opts[:customer_id], secret_key: opts[:secret_key])

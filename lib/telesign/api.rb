@@ -1,8 +1,6 @@
 require 'faraday'
 require 'json'
 
-TIMEOUT_IN_SECONDS = 30
-
 module TeleSign
   class Api
     #    * - Attributes
@@ -45,7 +43,8 @@ module TeleSign
         end
         faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
       end
-      @conn.request.options.timeout = TIMEOUT_IN_SECONDS
+      @conn.request.options.timeout = opts[:timeout] if opts[:timeout].present?
+      @conn.request.options.open_timeout = opts[:open_timeout] if opts[:open_timeout].present?
 
       @verify = Verify.new(conn: @conn, customer_id: opts[:customer_id], secret_key: opts[:secret_key])
       @phone_id = PhoneId.new(conn: @conn, customer_id: opts[:customer_id], secret_key: opts[:secret_key])

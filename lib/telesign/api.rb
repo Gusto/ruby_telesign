@@ -34,17 +34,20 @@ module TeleSign
       proxy = proxy_host ? "#{http_root}://#{proxy_host}" : nil
       url = "#{http_root}://#{api_host}"
 
-      @conn = Faraday.new(url: url) do |faraday|
-        faraday.request  :url_encoded
+      options = { url: url }
+      options[:request] = { } if !opts[:timeout].nil? || !options[:open_timeout].nil?
+      options[:request][:timeout] = opts[:timeout].to_i unless opts[:timeout].nil?
+      options[:request][:open_timeout] = opts[:open_timeout].to_i unless opts[:open_timeout].nil?
+
+      @conn = Faraday.new(options) do |faraday|
+        faraday.request :url_encoded
         if defined? Rails
           faraday.response :logger, Rails.logger
         else
-          faraday.response :logger                  # log requests to STDOUT
+          faraday.response :logger # log requests to STDOUT
         end
-        faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
+        faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
       end
-      @conn.request.options.timeout = opts[:timeout].to_i unless opts[:timeout].nil?
-      @conn.request.options.open_timeout = opts[:open_timeout].to_i unless opts[:open_timeout].nil?
 
       @verify = Verify.new(conn: @conn, customer_id: opts[:customer_id], secret_key: opts[:secret_key])
       @phone_id = PhoneId.new(conn: @conn, customer_id: opts[:customer_id], secret_key: opts[:secret_key])
